@@ -1,6 +1,7 @@
 import express from 'express'
-import { PORT } from './config/serverConfig.js'
 import { StatusCodes } from 'http-status-codes'
+
+import { PORT } from './config/serverConfig.js'
 
 const app = express()
 
