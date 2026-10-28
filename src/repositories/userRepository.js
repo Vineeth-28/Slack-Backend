@@ -1,20 +1,18 @@
-import User from '../schema/user.js';
-import crudRepository from './crudRepository.js';
+import User from '../schema/user.js'
+import crudRepository from './crudRepository.js'
 
 const userRepository = {
   ...crudRepository(User),
-  
- 
-  getbyEmail: async function (email) {
-    const user = await User.findOne({ email });
-    return user;
-  },
-  
- 
-  getByUsername: async function (username) {
-    const user = await User.findOne({ username }).select('-password');
-    return user;
-  }
-};
 
-export default userRepository;
+  getbyEmail: async function (email) {
+    const user = await User.findOne({ email })
+    return user
+  },
+
+  getByUsername: async function (username) {
+    const user = await User.findOne({ username }).select('-password')
+    return user
+  }
+}
+
+export default userRepository

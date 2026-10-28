@@ -36,13 +36,13 @@ const userSchema = new mongoose.Schema(
 
 userSchema.pre('save', async function saveUser() {
   if (this.isModified('password')) {
-    this.password = await bcrypt.hash(this.password, 9);
+    this.password = await bcrypt.hash(this.password, 9)
   }
 
   if (this.isNew || this.isModified('username')) {
-    this.avatar = `https://robohash.org/${this.username}`;
+    this.avatar = `https://robohash.org/${this.username}`
   }
-});
+})
 
 const User = mongoose.model('User', userSchema)
 export default User
