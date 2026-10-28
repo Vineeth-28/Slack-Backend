@@ -1,4 +1,5 @@
-import bycrpt from 'bcrypt'
+// FIXED: Changed the import alias name from 'bycrpt' to 'bcrypt'
+import bcrypt from 'bcrypt'
 import mongoose from 'mongoose'
 
 const userSchema = new mongoose.Schema(
@@ -33,14 +34,15 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 )
 
-userSchema.pre('save', function saveUser(next) {
-  const user = this
-  const SALT = bycrpt.genSaltSync(9)
-  const hashPassword = bycrpt.hashSync(user.password, SALT)
-  User.password = hashPassword
-  user.avatar = `https://robohash.org/${user.username}`
-  next()
-})
+userSchema.pre('save', async function saveUser() {
+  if (this.isModified('password')) {
+    this.password = await bcrypt.hash(this.password, 9);
+  }
+
+  if (this.isNew || this.isModified('username')) {
+    this.avatar = `https://robohash.org/${this.username}`;
+  }
+});
 
 const User = mongoose.model('User', userSchema)
 export default User
