@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from 'mongoose'
 
 const userSchema = new mongoose.Schema(
   {
@@ -30,13 +30,13 @@ const userSchema = new mongoose.Schema(
     }
   },
   { timestamps: true }
-);
+)
 
 userSchema.pre('save', function saveUser(next) {
-  const user = this;
-  user.avatar = `https://robohash.org/${user.username}`;
-  next();
-});
+  const user = this
+  user.avatar = `https://robohash.org/${user.username}`
+  next()
+})
 
-const User = mongoose.model('User', userSchema);
-export default User;
+const User = mongoose.model('User', userSchema)
+export default User
