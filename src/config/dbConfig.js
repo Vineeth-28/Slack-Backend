@@ -1,10 +1,8 @@
 import mongoose from 'mongoose'
 
+import { MONGO_URI } from './serverConfig.js'
+
 export default async function connectDB() {
-  try {
-    await mongoose.connect(process.env.MONGO_URI, {})
-    console.log('MongoDB connected')
-  } catch (error) {
-    console.log('Error connecting to MongoDB:', error)
-  }
+  await mongoose.connect(MONGO_URI)
+  console.log('MongoDB connected')
 }

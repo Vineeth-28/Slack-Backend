@@ -1,19 +1,19 @@
-export const internalErrorResponse = (error) => {
+export const internalErrorResponse = () => {
   return {
     success: false,
-    err: error,
+    err: [],
     data: {},
     message: 'Internal Server Error'
   }
 }
 
 export const customErrorResponse = (error) => {
-  if (!error.message && !error.explaination) {
+  if (!error.message && !error.explanation) {
     return internalErrorResponse(error)
   }
   return {
     success: false,
-    err: error.explaination,
+    err: error.explanation ?? [],
     data: [],
     message: error.message
   }

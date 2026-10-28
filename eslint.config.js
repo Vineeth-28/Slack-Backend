@@ -10,7 +10,7 @@ export default defineConfig([
     rules: {
       'simple-import-sort/imports': 'error',
       'simple-import-sort/exports': 'error',
-      "no-unused-vars": ["error", { "args": "none" }]
+      //"no-unused-vars": ["error", { "args": "none" }]
   
     },
     extends: ['js/recommended'],

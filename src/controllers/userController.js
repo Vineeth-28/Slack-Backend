@@ -10,20 +10,25 @@ export const signUp = async (req, res) => {
   try {
     const user = await signUpService(req.body)
 
-    // 2. Fixed: standard JSON response formatting wrapped in a single object
     return res.status(StatusCodes.CREATED).json({
       success: true,
       message: 'User Created Successfully',
-      data: user
+      data: {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        avatar: user.avatar,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt
+      }
     })
   } catch (error) {
-    console.log('user Controller error', error)
+    console.error('User controller error:', error)
 
     if (error.statusCode) {
       return res.status(error.statusCode).json(customErrorResponse(error))
     }
 
-    // 3. Fixed: Corrected the status method chaining for internal server errors
     return res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json(internalErrorResponse(error))
