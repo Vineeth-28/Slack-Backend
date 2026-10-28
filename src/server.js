@@ -6,7 +6,6 @@ import swaggerUi from 'swagger-ui-express';
 import connectDB from './config/dbConfig.js';
 import { PORT } from './config/serverConfig.js';
 import apiRouter from './routes/apiRoutes.js';
-// FIX 1: Import the missing publicationsRouter
 import publicationsRouter from './routes/publications.js'; 
 
 const app = express();
