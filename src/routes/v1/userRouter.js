@@ -1,6 +1,8 @@
 import express from 'express'
 import { StatusCodes } from 'http-status-codes'
 
+import { signUp } from '../../controllers/userController.js'
+
 const router = express.Router()
 
 router.get('/', (req, res) => {
@@ -8,5 +10,7 @@ router.get('/', (req, res) => {
     message: '/Get users'
   })
 })
+
+router.post('/signup', signUp)
 
 export default router

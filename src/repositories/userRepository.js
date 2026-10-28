@@ -12,5 +12,4 @@ const userRepository = {
     return user
   }
 }
-
-export default userRepository()
+export default userRepository

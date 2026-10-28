@@ -35,9 +35,9 @@ const userSchema = new mongoose.Schema(
 
 userSchema.pre('save', function saveUser(next) {
   const user = this
-  const SALT = bycrpt.genSaltSync(9);
-  const hashPassword = bycrpt.hashSync(user.password , SALT)
-  User.password = hashPassword;
+  const SALT = bycrpt.genSaltSync(9)
+  const hashPassword = bycrpt.hashSync(user.password, SALT)
+  User.password = hashPassword
   user.avatar = `https://robohash.org/${user.username}`
   next()
 })
