@@ -9,9 +9,8 @@ export default defineConfig([
     plugins: { js, 'simple-import-sort': simpleImportSort },
     rules: {
       'simple-import-sort/imports': 'error',
-      'simple-import-sort/exports': 'error',
+      'simple-import-sort/exports': 'error'
       //"no-unused-vars": ["error", { "args": "none" }]
-  
     },
     extends: ['js/recommended'],
     languageOptions: { globals: globals.node }
