@@ -1,48 +1,48 @@
-import mongoose from 'mongoose';
+import mongoose from 'mongoose'
 
 const workspaceSchema = new mongoose.Schema(
   {
     type: {
       type: String,
-      required: [true, 'Workspace type is required'],
+      required: [true, 'Workspace type is required']
     },
     name: {
       type: String,
       required: [true, 'Workspace name is required'],
-      unique: true,
+      unique: true
     },
     description: {
-      type: String,
+      type: String
     },
     members: [
       {
         memberId: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: 'User',
+          ref: 'User'
         },
         role: {
           type: String,
           enum: ['admin', 'member'],
-          default: 'member',
-        },
-      },
+          default: 'member'
+        }
+      }
     ],
     joinCode: {
       type: String,
-      required: [true, 'Join code is required'],
+      required: [true, 'Join code is required']
     },
     channels: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Channel',
-      },
-    ],
+        ref: 'Channel'
+      }
+    ]
   },
   {
-    timestamps: true, // Optional: adds createdAt and updatedAt fields
+    timestamps: true // Optional: adds createdAt and updatedAt fields
   }
-);
+)
 
-const Workspace = mongoose.model('Workspace', workspaceSchema);
+const Workspace = mongoose.model('Workspace', workspaceSchema)
 
-export default Workspace;
+export default Workspace

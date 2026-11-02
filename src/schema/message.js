@@ -17,10 +17,10 @@ const messageSchema = new mongoose.Schema({
     ref: 'User',
     requried: [true, 'Sender Id is requried']
   },
-  workspace:{
-    type:mongoose.Schema.Types.ObjectId,
-    ref:'Workspace',
-    required:[true ,'Workspace is required']
+  workspace: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Workspace',
+    required: [true, 'Workspace is required']
   }
 })
 
