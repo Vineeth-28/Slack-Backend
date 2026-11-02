@@ -36,7 +36,7 @@ const WorkspaceRepository = {
     return workspace
   },
 
-  addChannelToWorkspace: async function (workspaceId, channelId) {
+  addChannelToWorkspace: async function (workspaceId, channelName) {
     const workspace = await Workspace.findById(workspaceId)
     if (!workspace) {
       throw new clientError({
@@ -47,8 +47,8 @@ const WorkspaceRepository = {
     }
 
     // Prevents duplicate channel references
-    if (!workspace.channels.includes(channelId)) {
-      workspace.channels.push(channelId)
+    if (!workspace.channels.includes(channelName)) {
+      workspace.channels.push(channelName)
       await workspace.save()
     }
     return workspace
@@ -99,7 +99,7 @@ const WorkspaceRepository = {
    
     const workspaces = await Workspace.find({
       'members.memberId': memberId
-    })
+    }).populate('members.memberId', 'Username ,email,avatar')
     return workspaces
   }
 }
