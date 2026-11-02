@@ -2,7 +2,10 @@ import express from 'express'
 import { StatusCodes } from 'http-status-codes'
 
 import { signIn, signUp } from '../../controllers/userController.js'
-import { userSignInSchema,userSignUpSchema } from '../../validators/userSchema.js'
+import {
+  userSignInSchema,
+  userSignUpSchema
+} from '../../validators/userSchema.js'
 import { validate } from '../../validators/zodValidator.js'
 
 const router = express.Router()
@@ -13,7 +16,7 @@ router.get('/', (req, res) => {
   })
 })
 
-router.post('/signup',validate(userSignUpSchema) ,signUp)
-router.post('/signIn' ,validate (userSignInSchema) , signIn )
+router.post('/signup', validate(userSignUpSchema), signUp)
+router.post('/signIn', validate(userSignInSchema), signIn)
 
 export default router

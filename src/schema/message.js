@@ -1,23 +1,23 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose'
 const messageSchema = new mongoose.Schema({
-    body:{
-        type:String,
-        required:[true , 'Message body is requried']
-    }
-    , image:{
-        type:String
-    },
-    channelId:{
-        type: mongoose.Schema.Types.ObjectId,
-        ref:'Channel',
-        required:[true , 'Channel Id is required']
-    },
-    senderId:{
-        type: mongoose.Schema.Types.ObjectId,
-        ref:'User',
-        requried:[true ,'Sender Id is requried']
-    }
+  body: {
+    type: String,
+    required: [true, 'Message body is requried']
+  },
+  image: {
+    type: String
+  },
+  channelId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Channel',
+    required: [true, 'Channel Id is required']
+  },
+  senderId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    requried: [true, 'Sender Id is requried']
+  }
 })
 
-const message= mongoose.model('Message', messageSchema)
+const message = mongoose.model('Message', messageSchema)
 export default message

@@ -31,40 +31,36 @@ export const signUpService = async (data) => {
   }
 }
 
-
-export const signInService = async(data) =>{
-
-  try{
-       const user = await userRepository.getbyEmail(data.email)
-       if(!user){
-          throw new clientError({
-            explaination:'Invalid data send from the client',
-            message:'No user found with registered email',
-            Statuscode:StatusCodes.NOT_FOUND
-          });
-       }
-
-   //match the incoming password with hash password
-    const isMatch= bcrypt.compareSync(data.password , user.password);
-    if(!isMatch){
+export const signInService = async (data) => {
+  try {
+    const user = await userRepository.getbyEmail(data.email)
+    if (!user) {
       throw new clientError({
-        explaination:'Invalid data sent from the client',
-        message:'Invalid password try again',
-        statusCode:StatusCodes.UNAUTHORIZED
+        explaination: 'Invalid data send from the client',
+        message: 'No user found with registered email',
+        Statuscode: StatusCodes.NOT_FOUND
+      })
+    }
+
+    //match the incoming password with hash password
+    const isMatch = bcrypt.compareSync(data.password, user.password)
+    if (!isMatch) {
+      throw new clientError({
+        explaination: 'Invalid data sent from the client',
+        message: 'Invalid password try again',
+        statusCode: StatusCodes.UNAUTHORIZED
       })
     }
     return {
-      username:user.username,
-      avatar:user.avatar,
-      email:user.email,
-      token:createJWT( {
+      username: user.username,
+      avatar: user.avatar,
+      email: user.email,
+      token: createJWT({
         user: user._id,
-        email:user.email
+        email: user.email
       })
     }
-
-  }
-  catch(error){
-   console.log('User Service Error' , error)
+  } catch (error) {
+    console.log('User Service Error', error)
   }
 }
