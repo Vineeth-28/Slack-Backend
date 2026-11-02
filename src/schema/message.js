@@ -16,6 +16,11 @@ const messageSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     requried: [true, 'Sender Id is requried']
+  },
+  workspace:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'Workspace',
+    required:[true ,'Workspace is required']
   }
 })
 
