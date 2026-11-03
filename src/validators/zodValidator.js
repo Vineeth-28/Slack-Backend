@@ -11,8 +11,9 @@ export const validate = (schema) => {
       console.error('Validation error in zod validation', error)
 
       // Format Zod errors into a clean, readable structure
-      const explanation = error.errors
-        ? error.errors.map((err) => `${err.path.join('.')}: ${err.message}`)
+      const issues = error.issues ?? error.errors
+      const explanation = issues
+        ? issues.map((err) => `${err.path.join('.') || 'body'}: ${err.message}`)
         : [error.message || 'Invalid request data']
 
       return res.status(StatusCodes.BAD_REQUEST).json(

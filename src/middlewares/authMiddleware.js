@@ -1,8 +1,8 @@
 import { StatusCodes } from 'http-status-codes'
 import jwt from 'jsonwebtoken'
 
-import { JWT_SECRET } from '../config/serverConfig'
-import { userRepository } from '../repositories/userRepository.js'
+import { JWT_SECRET } from '../config/serverConfig.js'
+import userRepository from '../repositories/userRepository.js'
 import {
   customErrorResponse,
   internalErrorResponse
@@ -10,7 +10,7 @@ import {
 
 export const isAuthenticated = async (req, res, next) => {
   try {
-    const token = req.headers('x-access-token')
+    const token = req.headers['x-access-token']
 
     if (!token) {
       return res.status(StatusCodes.FORBIDDEN).json(
@@ -31,8 +31,24 @@ export const isAuthenticated = async (req, res, next) => {
         })
       )
     }
-    const user = await userRepository.getById(response.id)
+
+    // 1. Fetch user from the database
+    const user = await userRepository.getById(response.user)
+
+    // 2. ✅ CRITICAL FIX: Guard against null database records
+    if (!user) {
+      return res.status(StatusCodes.UNAUTHORIZED).json(
+        customErrorResponse({
+          explaination:
+            'The user session is invalid or the account was deleted',
+          message: 'User no longer exists'
+        })
+      )
+    }
+
+    // 3. Now it is perfectly safe to access the .id property
     req.user = user.id
+
     // Proceed to the next middleware or controller if the token is valid
     next()
   } catch (error) {

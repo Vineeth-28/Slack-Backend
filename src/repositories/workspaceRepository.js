@@ -36,7 +36,7 @@ const WorkspaceRepository = {
     return workspace
   },
 
-  addChannelToWorkspace: async function (workspaceId, channelName) {
+  addChannelToWorkspace: async function (workspaceId, channelId) {
     const workspace = await Workspace.findById(workspaceId)
     if (!workspace) {
       throw new clientError({
@@ -47,8 +47,8 @@ const WorkspaceRepository = {
     }
 
     // Prevents duplicate channel references
-    if (!workspace.channels.includes(channelName)) {
-      workspace.channels.push(channelName)
+    if (!workspace.channels.some((id) => id.equals(channelId))) {
+      workspace.channels.push(channelId)
       await workspace.save()
     }
     return workspace
@@ -82,7 +82,7 @@ const WorkspaceRepository = {
       throw new clientError({
         explaination: 'Invalid data sent from client',
         message: 'User Already a part of Workspace',
-        statusCode: StatusCodes.BAD_REQUEST 
+        statusCode: StatusCodes.BAD_REQUEST
       })
     }
 
@@ -96,7 +96,6 @@ const WorkspaceRepository = {
   },
 
   fetchAllWorkspaceByMemberId: async function (memberId) {
-   
     const workspaces = await Workspace.find({
       'members.memberId': memberId
     }).populate('members.memberId', 'Username ,email,avatar')
