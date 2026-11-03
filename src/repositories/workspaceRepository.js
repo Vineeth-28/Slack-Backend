@@ -1,5 +1,7 @@
 import { StatusCodes } from 'http-status-codes'
 
+import Channel from '../schema/channel.js'
+import Message from '../schema/message.js'
 import User from '../schema/user.js'
 import Workspace from '../schema/workSpace.js'
 import clientError from '../utils/errors/clientErrors.js'
@@ -100,6 +102,13 @@ const WorkspaceRepository = {
       'members.memberId': memberId
     }).populate('members.memberId', 'username email avatar')
     return workspaces
+  },
+
+  deleteWorkspace: async function (workspace) {
+    await Message.deleteMany({ workspace: workspace._id })
+    await Channel.deleteMany({ _id: { $in: workspace.channels } })
+    await Workspace.deleteOne({ _id: workspace._id })
+    return { id: workspace.id, name: workspace.name }
   }
 }
 
