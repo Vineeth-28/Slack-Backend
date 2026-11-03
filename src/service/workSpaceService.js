@@ -23,3 +23,15 @@ export const createWorkspaceService = async (workspaceData) => {
     generalChannel._id
   )
 }
+
+
+export const getWorkspaceUserIsMemberofService =async(userId)=>{
+  try{
+     const response = await WorkspaceRepository.fetchAllWorkspaceByMemberId(userId);
+     return response;
+  }
+  catch(error){
+    console.log('Get workspace is member of service error',error);
+    throw error
+  }
+}
