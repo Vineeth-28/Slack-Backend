@@ -110,6 +110,8 @@ const WorkspaceRepository = {
     await Workspace.deleteOne({ _id: workspace._id })
     return { id: workspace.id, name: workspace.name }
   }
+
+
 }
 
 export default WorkspaceRepository
