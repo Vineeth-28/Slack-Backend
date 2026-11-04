@@ -1,7 +1,6 @@
 import express from 'express'
 
 import {
-  addChannelToWorkspaceController,
   addMembertoWorkspaceController,
   createWorkspaceController,
   deleteWorkspaceController,
@@ -12,7 +11,6 @@ import {
 } from '../../controllers/workSpaceController.js'
 import { isAuthenticated } from '../../middlewares/authMiddleware.js'
 import {
-  addWorkspaceChannelSchema,
   addWorkspaceMemberSchema,
   joinWorkspaceSchema,
   updateWorkspaceMemberSchema,
@@ -48,12 +46,6 @@ router.patch(
   isAuthenticated,
   validate(updateWorkspaceMemberSchema),
   updateWorkspaceController
-)
-router.post(
-  '/:workspaceId/channels',
-  isAuthenticated,
-  validate(addWorkspaceChannelSchema),
-  addChannelToWorkspaceController
 )
 router.delete('/:workspaceId', isAuthenticated, deleteWorkspaceController)
 

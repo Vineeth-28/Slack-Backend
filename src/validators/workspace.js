@@ -22,3 +22,7 @@ export const updateWorkspaceMemberSchema = z.object({
 export const addWorkspaceChannelSchema = z.object({
   name: z.string().trim().min(1)
 })
+
+export const updateWorkspaceChannelSchema = z.object({
+  name: z.string().trim().min(1)
+})

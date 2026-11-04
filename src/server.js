@@ -19,6 +19,6 @@ app.get('/health', (req, res) => {
 
 app.listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`)
-  //console.log(`Swagger UI available at http://localhost:${PORT}/api-docs`)
+ 
   await connectDB()
 })

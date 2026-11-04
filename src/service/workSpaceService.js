@@ -112,8 +112,8 @@ export const getWorkspaceService = async (workspaceId, userId) => {
     })
   }
 
-  const membership = workspace.members.find(
-    (member) => member.memberId && member.memberId._id
+  const membership = workspace.members.find((member) =>
+    member.memberId && member.memberId._id
       ? member.memberId._id.toString() === userId.toString()
       : member.memberId.toString() === userId.toString()
   )
@@ -161,7 +161,11 @@ export const getWorkspaceByJoinCodeService = async (...args) => {
   )
 
   if (!isAlreadyMember) {
-    await WorkspaceRepository.addMembertoWorkspace(workspace._id, userId, 'member')
+    await WorkspaceRepository.addMembertoWorkspace(
+      workspace._id,
+      userId,
+      'member'
+    )
     return Workspace.findById(workspace._id)
       .populate('members.memberId', 'username email avatar')
       .populate('channels', 'name')
@@ -210,7 +214,11 @@ export const updateWorkspaceService = async (workspaceId, memberId, role) => {
   return workspace
 }
 
-export const addMembertoWorkspaceService = async (workspaceId, memberId, role) => {
+export const addMembertoWorkspaceService = async (
+  workspaceId,
+  memberId,
+  role
+) => {
   ensureValidObjectId(workspaceId, 'Workspace')
   ensureValidObjectId(memberId, 'Member')
 
@@ -227,31 +235,4 @@ export const addMembertoWorkspaceService = async (workspaceId, memberId, role) =
     memberId,
     role || 'member'
   )
-}
-
-export const addChannelToWorkspaceService = async (workspaceId, channelName) => {
-  ensureValidObjectId(workspaceId, 'Workspace')
-
-  const trimmedName = channelName?.trim()
-  if (!trimmedName) {
-    throw new clientError({
-      message: 'Channel name is required',
-      explanation: 'A valid channel name must be provided',
-      statusCode: StatusCodes.BAD_REQUEST
-    })
-  }
-
-  const workspace = await WorkspaceRepository.getById(workspaceId)
-  if (!workspace) {
-    throw new clientError({
-      message: 'Workspace not found',
-      explanation: 'No workspace exists with the provided ID',
-      statusCode: StatusCodes.NOT_FOUND
-    })
-  }
-
-  const existingChannel = await Channel.findOne({ name: trimmedName })
-  const channel = existingChannel || (await Channel.create({ name: trimmedName }))
-
-  return WorkspaceRepository.addChannelToWorkspace(workspace._id, channel._id)
 }
