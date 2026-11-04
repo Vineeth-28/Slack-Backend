@@ -2,6 +2,7 @@ import express from 'express'
 import { StatusCodes } from 'http-status-codes'
 
 import connectDB from './config/dbConfig.js'
+import { sendStartupEmail } from './config/nodemailerConfig.js'
 import { PORT } from './config/serverConfig.js'
 import apiRouter from './routes/apiRoutes.js'
 
@@ -19,6 +20,13 @@ app.get('/health', (req, res) => {
 
 app.listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`)
- 
-  await connectDB()
+
+  try {
+    await connectDB()
+    const result = await sendStartupEmail()
+    console.log(`Startup test email sent.Message ID: ${result.messageId}`)
+    console.log('Startup test email sent.')
+  } catch (error) {
+    console.error('Server startup task failed:', error)
+  }
 })

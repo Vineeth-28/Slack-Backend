@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to the Workspace</title>
+    <!-- Embedded styles are included for clients that support them, but primary styling is inline for bulletproof delivery -->
+    <style>
+        @import url('https://googleapis.com');
+        
+        @media screen and (max-width: 620px) {
+            .email-container {
+                width: 100% !important;
+                margin: 0 !important;
+            }
+            .step-item {
+                padding: 12px !important;
+            }
+        }
+        /* Interactive hover effect for modern email clients */
+        .cta-button:hover {
+            background-color: #4338ca !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3) !important;
+        }
+    </style>
+</head>
+<body style="font-family: 'Inter', Arial, sans-serif; margin: 0; padding: 40px 20px; background-color: #f8fafc; -webkit-font-smoothing: antialiased;">
+    <table align="center" border="0" cellpadding="0" cellspacing="0" width="600" class="email-container" style="background-color: #ffffff; border-collapse: collapse; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.05); overflow: hidden;">
+        
+        <!-- Header with a sleek Linear Gradient CSS -->
+        <tr>
+            <td style="padding: 48px 40px; text-align: center; background: #4F46E5; background: linear-gradient(135deg, #4F46E5 0%, #6366F1 100%);">
+                <!-- Decorative Icon Badge -->
+                <div style="background-color: rgba(255, 255, 255, 0.15); display: inline-block; padding: 12px; border-radius: 50%; margin-bottom: 16px;">
+                    <span style="font-size: 28px; line-height: 1;">🚀</span>
+                </div>
+                <h1 style="color: #ffffff; margin: 0; font-size: 26px; font-weight: 700; letter-spacing: -0.5px; line-height: 1.3;">Welcome to {{workspaceName}}!</h1>
+            </td>
+        </tr>
+        
+        <!-- Body Content -->
+        <tr>
+            <td style="padding: 40px 40px 32px 40px; color: #334155; font-size: 16px; line-height: 1.6;">
+                <p style="margin: 0 0 16px 0; font-size: 18px; font-weight: 600; color: #1e293b;">Hi {{name}},</p>
+                <p style="margin: 0 0 32px 0; color: #64748b; font-size: 16px;">You have been successfully added to the <strong style="color: #1e293b;">{{workspaceName}}</strong> workspace. We are excited to have you collaborate with the team!</p>
+                
+                <p style="margin: 0 0 16px 0; font-weight: 600; color: #0f172a; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">Here is how to get started</p>
+                
+                <!-- Onboarding Checklist Block -->
+                <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 36px;">
+                    <tr>
+                        <td class="step-item" style="padding: 14px 16px; background-color: #f8fafc; border-left: 4px solid #4F46E5; border-radius: 0 6px 6px 0; margin-bottom: 10px; display: block;">
+                            <span style="font-weight: 600; color: #1e293b;">1. Configure Profile:</span> <span style="color: #475569;">Set up your profile and preferences.</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td height="10" style="font-size: 1px; line-height: 1px;">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td class="step-item" style="padding: 14px 16px; background-color: #f8fafc; border-left: 4px solid #6366F1; border-radius: 0 6px 6px 0; margin-bottom: 10px; display: block;">
+                            <span style="font-weight: 600; color: #1e293b;">2. Explore Assets:</span> <span style="color: #475569;">Review shared projects and documents.</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td height="10" style="font-size: 1px; line-height: 1px;">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td class="step-item" style="padding: 14px 16px; background-color: #f8fafc; border-left: 4px solid #818cf8; border-radius: 0 6px 6px 0; display: block;">
+                            <span style="font-weight: 600; color: #1e293b;">3. Connect:</span> <span style="color: #475569;">Say hello to your teammates in general chat!</span>
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- High-End CTA Button with Shadow and Transitions -->
+                <div style="text-align: center; margin: 24px 0 12px 0;">
+                    <a href="{{actionUrl}}" class="cta-button" style="background-color: #4F46E5; color: #ffffff; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; display: inline-block; transition: all 0.2s ease-in-out; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);">Join the Workspace</a>
+                </div>
+            </td>
+        </tr>
+        
+        <!-- Footer -->
+        <tr>
+            <td style="padding: 24px 40px; background-color: #f8fafc; font-size: 13px; color: #94a3b8; text-align: center; line-height: 1.5; border-top: 1px solid #f1f5f9;">
+                This invitation was sent to <span style="color: #64748b; font-weight: 500;">{{email}}</span>.<br>
+                If you weren't expecting this invite, please contact your workspace administrator.
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
