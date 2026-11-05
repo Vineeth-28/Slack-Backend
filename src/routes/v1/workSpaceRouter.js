@@ -6,6 +6,7 @@ import {
   deleteWorkspaceController,
   getWorkspaceByJoinCodeController,
   getWorkspaceController,
+  getWorkspaceMemberController,
   getWorkspaceUserIsMemberController,
   updateWorkspaceController
 } from '../../controllers/workSpaceController.js'
@@ -29,6 +30,11 @@ router.post(
 
 router.get('/', isAuthenticated, getWorkspaceUserIsMemberController)
 router.get('/:workspaceId', isAuthenticated, getWorkspaceController)
+router.get(
+  '/:workspaceId/members/:memberId',
+  isAuthenticated,
+  getWorkspaceMemberController
+)
 router.post(
   '/join',
   isAuthenticated,

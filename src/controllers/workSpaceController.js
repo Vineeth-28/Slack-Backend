@@ -1,5 +1,6 @@
 import { StatusCodes } from 'http-status-codes'
 
+import { isMemberPartOfWorkspace } from '../service/memberService.js'
 import {
   addMembertoWorkspaceService,
   createWorkspaceService,
@@ -66,6 +67,35 @@ export const getWorkspaceController = async (req, res) => {
     return res
       .status(StatusCodes.OK)
       .json(successResponse(response, 'Workspace fetched Successfully'))
+  } catch (error) {
+    if (error.statusCode) {
+      return res.status(error.statusCode).json(customErrorResponse(error))
+    }
+    return res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json(internalErrorResponse(error))
+  }
+}
+
+export const getWorkspaceMemberController = async (req, res) => {
+  try {
+    await getWorkspaceService(req.params.workspaceId, req.user)
+    const member = await isMemberPartOfWorkspace(
+      req.params.workspaceId,
+      req.params.memberId
+    )
+
+    return res.status(StatusCodes.OK).json(
+      successResponse(
+        {
+          id: member.id,
+          username: member.username,
+          email: member.email,
+          avatar: member.avatar
+        },
+        'Workspace member fetched successfully'
+      )
+    )
   } catch (error) {
     if (error.statusCode) {
       return res.status(error.statusCode).json(customErrorResponse(error))

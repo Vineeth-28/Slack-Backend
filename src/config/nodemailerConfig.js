@@ -44,6 +44,28 @@ export const sendEmail = async ({ to, subject, text, html }) => {
   })
 }
 
+export const sendWelcomeEmail = async ({
+  to,
+  name,
+  workspaceName,
+  subject = `Welcome to ${workspaceName}!`
+}) => {
+  const templateSource = await fs.readFile(templatePath, 'utf8')
+  const renderTemplate = Handlebars.compile(templateSource)
+  const html = renderTemplate({
+    workspaceName,
+    name,
+    actionUrl: FRONTEND_URL,
+    email: to
+  })
+
+  return sendEmail({
+    to,
+    subject,
+    html
+  })
+}
+
 export const sendStartupEmail = async () => {
   if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS || !TEST_EMAIL) {
     throw new Error(
@@ -51,18 +73,10 @@ export const sendStartupEmail = async () => {
     )
   }
 
-  const templateSource = await fs.readFile(templatePath, 'utf8')
-  const renderTemplate = Handlebars.compile(templateSource)
-  const html = renderTemplate({
+  return sendWelcomeEmail({
+    to: TEST_EMAIL,
     workspaceName: 'Slack Backend',
     name: 'Vineet',
-    actionUrl: FRONTEND_URL,
-    email: TEST_EMAIL
-  })
-
-  return sendEmail({
-    to: TEST_EMAIL,
-    subject: 'Slack Backend startup email test',
-    html
+    subject: 'Slack Backend startup email test'
   })
 }

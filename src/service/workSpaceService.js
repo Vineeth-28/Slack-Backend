@@ -2,6 +2,8 @@ import { StatusCodes } from 'http-status-codes'
 import mongoose from 'mongoose'
 import { v4 as uuidv4 } from 'uuid'
 
+import { sendWelcomeEmail } from '../config/nodemailerConfig.js'
+import userRepository from '../repositories/userRepository.js'
 import WorkspaceRepository from '../repositories/workspaceRepository.js'
 import Channel from '../schema/channel.js'
 import Workspace from '../schema/workSpace.js'
@@ -230,9 +232,18 @@ export const addMembertoWorkspaceService = async (
     })
   }
 
-  return WorkspaceRepository.addMembertoWorkspace(
+  const member = await userRepository.getById(memberId)
+  const workspace = await WorkspaceRepository.addMembertoWorkspace(
     workspaceId,
     memberId,
     role || 'member'
   )
+
+  await sendWelcomeEmail({
+    to: member.email,
+    name: member.username,
+    workspaceName: workspace.name
+  })
+
+  return workspace
 }
