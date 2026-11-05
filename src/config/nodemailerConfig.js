@@ -26,11 +26,23 @@ const transporter = nodemailer.createTransport({
   host: SMTP_HOST,
   port: SMTP_PORT,
   secure: SMTP_PORT === 465,
-  auth: {
-    user: SMTP_USER,
-    pass: SMTP_PASS
-  }
+  auth:
+    SMTP_USER && SMTP_PASS ? { user: SMTP_USER, pass: SMTP_PASS } : undefined
 })
+
+export const sendEmail = async ({ to, subject, text, html }) => {
+  if (!SMTP_HOST || !SMTP_FROM) {
+    throw new Error('Email is not configured. Set SMTP_HOST and SMTP_FROM.')
+  }
+
+  return transporter.sendMail({
+    from: SMTP_FROM,
+    to,
+    subject,
+    text,
+    html
+  })
+}
 
 export const sendStartupEmail = async () => {
   if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS || !TEST_EMAIL) {
@@ -48,8 +60,7 @@ export const sendStartupEmail = async () => {
     email: TEST_EMAIL
   })
 
-  return transporter.sendMail({
-    from: SMTP_FROM,
+  return sendEmail({
     to: TEST_EMAIL,
     subject: 'Slack Backend startup email test',
     html

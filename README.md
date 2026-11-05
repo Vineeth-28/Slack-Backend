@@ -18,6 +18,8 @@ A lightweight backend for a Slack-inspired collaboration platform built with Nod
 - Node.js
 - Express.js
 - MongoDB + Mongoose
+- Redis + BullMQ for queued bulk email delivery
+- Nodemailer for SMTP email delivery and the server startup email check
 - JWT for authentication
 - Zod for validation
 - ESLint + Prettier for code quality
@@ -30,15 +32,17 @@ Slack/
 │   ├── config/          # DB and server configuration
 │   ├── controllers/     # Request handlers
 │   ├── middlewares/     # Authentication middleware
+│   ├── queues/          # BullMQ queue configuration
 │   ├── repositories/    # Data access layer
 │   ├── routes/          # API route definitions
 │   ├── schema/          # Mongoose models
 │   ├── service/         # Business logic
+│   ├── templates/       # Email templates
 │   ├── utils/           # Shared helpers and errors
 │   ├── validators/      # Zod validation schemas
+│   ├── workers/         # Background job processors
 │   ├── server.js        # App bootstrap
 │   └── ...
-├── test/                # Test files
 ├── .env                 # Environment variables
 ├── .gitignore
 ├── eslint.config.js
@@ -51,8 +55,10 @@ Slack/
 
 Before running this project, make sure you have:
 
-- Node.js 18 or later
+- Node.js 20.19+, 22.13+, or 24+
 - MongoDB running locally or a MongoDB Atlas connection string
+- Redis running locally or an accessible Redis service
+- An SMTP server and credentials for the startup email check and bulk email
 - A terminal environment with npm installed
 
 ## Installation
@@ -77,7 +83,24 @@ PORT=3000
 MONGO_URI=mongodb://localhost:27017/Slack
 JWT_SECRET=your_super_secret_key
 JWT_EXPIRY=1h
+REDIS_HOST=127.0.0.1
+REDIS_PORT=6379
+REDIS_USERNAME=
+REDIS_PASSWORD=
+SMTP_HOST=smtp.example.com
+SMTP_PORT=587
+SMTP_USER=your_smtp_username
+SMTP_PASS=your_smtp_password
+SMTP_FROM=you@example.com
+TEST_EMAIL=you@example.com
+FRONTEND_URL=http://localhost:3000
 ```
+
+Redis credentials are optional for servers that do not require authentication.
+`SMTP_FROM` defaults to `SMTP_USER` when omitted. On startup, the server connects
+to MongoDB and attempts to send a test email to `TEST_EMAIL`; configure valid
+SMTP settings and a test recipient to complete that check. A startup task error
+is logged if the database or email check fails, but the HTTP server still starts.
 
 ## Running the Server
 
@@ -94,6 +117,17 @@ For a normal start:
 ```bash
 node src/server.js
 ```
+
+Run one or more email workers in separate processes to process queued mail:
+
+```bash
+npm run worker:email
+```
+
+Each worker shares a queue-wide BullMQ limiter, so email delivery is capped at
+100 messages per minute across worker processes. Failed sends are retried up to
+five times with exponential backoff. Redis must be available to both the API and
+worker processes.
 
 ## Health Check
 
@@ -120,6 +154,42 @@ The backend is mounted under /api and versioned under /v1.
 ```http
 POST /api/v1/users/signup
 POST /api/v1/users/signIn
+```
+
+### Bulk email
+
+```http
+POST /api/v1/emails/bulk
+X-Access-Token: <JWT>
+Content-Type: application/json
+```
+
+The authenticated endpoint queues one job per recipient and accepts up to 100
+unique email addresses per request (case-insensitive uniqueness). The subject
+must be 1-200 characters, and at least one of `text` or `html` is required. Each
+content field is limited to 20,000 characters, and the sender is always
+`SMTP_FROM`.
+
+```json
+{
+  "recipients": ["one@example.com", "two@example.com"],
+  "subject": "An update from Slack",
+  "text": "Here is the latest update."
+}
+```
+
+When Redis accepts the jobs, the endpoint responds with HTTP 202. Sending is
+asynchronous and limited to 100 emails per minute across workers.
+
+```json
+{
+  "success": true,
+  "message": "Emails queued successfully",
+  "data": {
+    "batchId": "generated-batch-id",
+    "queued": 2
+  }
+}
 ```
 
 ### Workspaces
@@ -149,7 +219,7 @@ DELETE /api/v1/workspaces/:workspaceId/channels/:channelId
 - Users sign up with email, username, and password.
 - Passwords are hashed before storage.
 - Users sign in to receive a JWT token.
-- Protected routes require the JWT token in the authorization flow used by the application middleware.
+- Protected routes require the JWT token in the `X-Access-Token` header.
 
 ## Notes
 
@@ -168,6 +238,9 @@ npm run format     # format code with Prettier
 npm run format:check
 npm test           # run the test suite
 ```
+
+The test command currently finds no test files, so it exits successfully with
+zero tests.
 
 ## License
 
