@@ -269,6 +269,27 @@ Example response:
 }
 ```
 
+### Real-time messages
+
+The Socket.IO server accepts `newMessage` (the recommended event name) and
+`NEW_MESSAGE_EVENT` (an alias for clients using the constant's identifier as
+the event name). A new message is broadcast to all connected clients on the
+same event name it was sent on, after it has been saved.
+
+Send a JSON object with all required message fields:
+
+```json
+{
+  "body": "Hello, everyone!",
+  "channelId": "<channelId>",
+  "senderId": "<userId>",
+  "workspace": "<workspaceId>"
+}
+```
+
+`body`, `channelId`, `senderId`, and `workspace` are required. Plain text alone
+cannot be saved as a message.
+
 ## Authentication Flow
 
 - Users sign up with email, username, and password.

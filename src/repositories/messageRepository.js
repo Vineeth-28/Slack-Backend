@@ -13,5 +13,4 @@ const messageRepository = {
   }
 }
 
-
 export default messageRepository

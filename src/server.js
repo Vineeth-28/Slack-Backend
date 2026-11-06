@@ -4,12 +4,13 @@ import { StatusCodes } from 'http-status-codes'
 import { Server } from 'socket.io' // 1. Capitalized "Server" here
 
 import connectDB from './config/dbConfig.js'
-//import { sendStartupEmail } from './config/nodemailerConfig.js'
 import { PORT } from './config/serverConfig.js'
+//import { sendStartupEmail } from './config/nodemailerConfig.js'
+import messageSocketController from './controllers/messageSocketController.js'
 import apiRouter from './routes/apiRoutes.js'
 
 const app = express()
-const server = createServer(app)    // 2. "server" variable conflict resolved
+const server = createServer(app) // 2. "server" variable conflict resolved
 const io = new Server(server)
 
 app.use(express.json())
@@ -34,7 +35,7 @@ io.on('connection', (socket) => {
   //   console.log('Message from client:', data)
   //   socket.emit('MessagefromServer', data.toUpperCase()) // 4. Corrected the event name to match the emitted event
   // })
-  messageSocketController(io, socket);
+  messageSocketController(io, socket)
 })
 
 server.listen(PORT, async () => {
@@ -43,7 +44,7 @@ server.listen(PORT, async () => {
   try {
     await connectDB()
     //const result = await sendStartupEmail()
-   // console.log(`Startup test email sent. Message ID: ${result.messageId}`)
+    // console.log(`Startup test email sent. Message ID: ${result.messageId}`)
     console.log('Startup test email sent.')
   } catch (error) {
     console.error('Server startup task failed:', error)
