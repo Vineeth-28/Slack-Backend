@@ -9,6 +9,7 @@ A lightweight backend for a Slack-inspired collaboration platform built with Nod
 - Workspace member management with admin and member roles
 - Join workspaces using a generated join code
 - Channel creation, retrieval, update, and deletion inside a workspace
+- Paginated message retrieval for workspace channels
 - Request validation with Zod
 - Centralized error handling and consistent API responses
 - MongoDB persistence with Mongoose models
@@ -212,6 +213,46 @@ GET /api/v1/workspaces/:workspaceId/channels
 GET /api/v1/workspaces/:workspaceId/channels/:channelId
 PATCH /api/v1/workspaces/:workspaceId/channels/:channelId
 DELETE /api/v1/workspaces/:workspaceId/channels/:channelId
+```
+
+### Messages
+
+Retrieve messages from a channel. The authenticated user must be a member of the
+workspace, and the channel must belong to that workspace.
+
+```http
+GET /api/v1/workspaces/:workspaceId/channels/:channelId/messages?page=1&limit=20
+X-Access-Token: <JWT>
+```
+
+Both query parameters are optional. `page` defaults to `1`; `limit` defaults to
+`20` and must be between `1` and `100`. Messages are returned newest first, with
+the sender's username, email, and avatar included.
+
+Example response:
+
+```json
+{
+  "success": true,
+  "message": "Messages fetched successfully",
+  "data": [
+    {
+      "_id": "message-id",
+      "body": "Hello, everyone!",
+      "channelId": "channel-id",
+      "senderId": {
+        "_id": "user-id",
+        "username": "alex",
+        "email": "alex@example.com",
+        "avatar": "https://example.com/avatar.png"
+      },
+      "workspace": "workspace-id",
+      "createdAt": "2026-11-06T12:00:00.000Z",
+      "updatedAt": "2026-11-06T12:00:00.000Z"
+    }
+  ],
+  "error": []
+}
 ```
 
 ## Authentication Flow
