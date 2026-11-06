@@ -225,9 +225,23 @@ GET /api/v1/workspaces/:workspaceId/channels/:channelId/messages?page=1&limit=20
 X-Access-Token: <JWT>
 ```
 
+For example, with `curl`:
+
+```bash
+curl "http://localhost:3000/api/v1/workspaces/<workspaceId>/channels/<channelId>/messages?page=1&limit=20" \
+  -H "X-Access-Token: <JWT>"
+```
+
 Both query parameters are optional. `page` defaults to `1`; `limit` defaults to
 `20` and must be between `1` and `100`. Messages are returned newest first, with
-the sender's username, email, and avatar included.
+the sender's username, email, and avatar included. A page beyond the available
+messages returns an empty `data` array; the response does not include a total
+count or additional pagination metadata.
+
+Invalid pagination values return HTTP 400. Requests without a valid token are
+rejected, and a user who is not a member of the workspace cannot read its
+messages. A channel that does not belong to the requested workspace returns
+HTTP 404.
 
 Example response:
 
