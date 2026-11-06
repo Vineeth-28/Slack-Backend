@@ -13,8 +13,11 @@ import {
   updateWorkspaceChannelSchema
 } from '../../validators/workspace.js'
 import { validate } from '../../validators/zodValidator.js'
+import messageRouter from './messageRouter.js'
 
 const router = express.Router({ mergeParams: true })
+
+router.use('/:channelId/messages', messageRouter)
 
 router.post(
   '/',
