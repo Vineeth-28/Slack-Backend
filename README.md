@@ -1,29 +1,111 @@
 ﻿# Slack Backend
 
-A lightweight backend for a Slack-inspired collaboration platform built with Node.js, Express, MongoDB, and Mongoose. It supports user authentication, workspace management, workspace member roles, and channel-based communication flows.
+A REST API and real-time messaging backend for a Slack-inspired collaboration
+platform. Built with Node.js, Express, MongoDB, and Socket.IO, this project
+demonstrates authenticated workspace and channel management, persistent
+messaging, and asynchronous bulk email delivery.
 
-## Features
+> **Hosted API:** Not deployed yet. The public backend URL will be added here
+> after hosting. Once deployed, verify it at `https://<your-backend-host>/health`.
 
-- User sign up and sign in with JWT-based authentication
-- Workspace creation and listing for authenticated users
-- Workspace member management with admin and member roles
-- Join workspaces using a generated join code
-- Channel creation, retrieval, update, and deletion inside a workspace
-- Paginated message retrieval for workspace channels
-- Request validation with Zod
-- Centralized error handling and consistent API responses
-- MongoDB persistence with Mongoose models
+[Source code](https://github.com/Vineeth-28/Slack-Backend) ·
+[API reference](#api-overview) · [Local setup](#getting-started)
+
+## Contents
+
+- [Project highlights](#project-highlights)
+- [Architecture](#architecture)
+- [Tech stack](#tech-stack)
+- [Getting started](#getting-started)
+- [Deployment](#deployment)
+- [API overview](#api-overview)
+- [Authentication](#authentication-flow)
+
+## Project Highlights
+
+- JWT-based user sign-up and sign-in; protected REST endpoints use the
+  `X-Access-Token` header.
+- Workspace creation and membership management, including joining a workspace
+  with its join code and admin/member roles.
+- Channel creation and management within workspaces.
+- Persisted channel messages, paginated REST retrieval, and real-time
+  Socket.IO message events.
+- Asynchronous bulk email with BullMQ and Redis, retry/backoff, and a shared
+  delivery rate limit.
+- Zod request validation, centralized response/error handling, and Mongoose
+  persistence.
+
+### Feature status
+
+| Feature                           | Status          | Notes                                                                                   |
+| --------------------------------- | --------------- | --------------------------------------------------------------------------------------- |
+| Workspace membership by join code | Implemented     | Adds a user to a workspace.                                                             |
+| Socket.IO room/channel joining    | Not implemented | There is no room-join event; messages are currently broadcast to all connected clients. |
+
+## Architecture
+
+```mermaid
+flowchart LR
+    Client[Web or API client]
+    API[Express REST API]
+    Socket[Socket.IO]
+    Auth[JWT authentication and Zod validation]
+    Logic[Controllers and services]
+    Mongo[(MongoDB)]
+    Queue[BullMQ email queue]
+    Redis[(Redis)]
+    Worker[Email worker]
+    SMTP[SMTP provider]
+
+    Client -->|HTTP /api/v1| API
+    API --> Auth --> Logic
+    Logic <--> Mongo
+    Client <-->|Socket.IO events| Socket
+    Socket --> Logic
+    Logic -->|enqueue bulk email| Queue
+    Queue <--> Redis
+    Redis --> Worker
+    Worker --> SMTP
+```
+
+### Message and email flows
+
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant API as Express API
+    participant S as Socket.IO server
+    participant M as Message service
+    participant DB as MongoDB
+    participant Q as Redis/BullMQ
+    participant W as Email worker
+    participant SMTP as SMTP provider
+
+    C->>S: newMessage (or NEW_MESSAGE_EVENT)
+    S->>M: Create message
+    M->>DB: Save message
+    DB-->>M: Persisted message
+    M-->>S: Created message
+    S-->>C: Broadcast event to connected clients
+
+    C->>API: POST /api/v1/emails/bulk
+    API->>Q: Enqueue recipient jobs
+    API-->>C: 202 Accepted
+    Q->>W: Process queued recipient jobs
+    W->>SMTP: Send email
+```
 
 ## Tech Stack
 
-- Node.js
-- Express.js
-- MongoDB + Mongoose
-- Redis + BullMQ for queued bulk email delivery
-- Nodemailer for SMTP email delivery and the server startup email check
-- JWT for authentication
-- Zod for validation
-- ESLint + Prettier for code quality
+| Area                          | Technologies        |
+| ----------------------------- | ------------------- |
+| Runtime and API               | Node.js, Express.js |
+| Data                          | MongoDB, Mongoose   |
+| Real-time                     | Socket.IO           |
+| Background jobs               | Redis, BullMQ       |
+| Email                         | Nodemailer, SMTP    |
+| Authentication and validation | JWT, Zod            |
+| Code quality                  | ESLint, Prettier    |
 
 ## Project Structure
 
@@ -52,17 +134,17 @@ Slack/
 └── package-lock.json
 ```
 
-## Prerequisites
+## Getting Started
 
-Before running this project, make sure you have:
+### Prerequisites
 
 - Node.js 20.19+, 22.13+, or 24+
-- MongoDB running locally or a MongoDB Atlas connection string
-- Redis running locally or an accessible Redis service
-- An SMTP server and credentials for the startup email check and bulk email
-- A terminal environment with npm installed
+- MongoDB (local instance or Atlas)
+- Redis for the bulk-email queue and worker
+- SMTP credentials to send bulk email
+- npm
 
-## Installation
+### Installation
 
 1. Clone the repository:
 
@@ -93,17 +175,16 @@ SMTP_PORT=587
 SMTP_USER=your_smtp_username
 SMTP_PASS=your_smtp_password
 SMTP_FROM=you@example.com
-TEST_EMAIL=you@example.com
 FRONTEND_URL=http://localhost:3000
 ```
 
-Redis credentials are optional for servers that do not require authentication.
-`SMTP_FROM` defaults to `SMTP_USER` when omitted. On startup, the server connects
-to MongoDB and attempts to send a test email to `TEST_EMAIL`; configure valid
-SMTP settings and a test recipient to complete that check. A startup task error
-is logged if the database or email check fails, but the HTTP server still starts.
+Redis credentials are optional when the Redis service does not require
+authentication. `SMTP_FROM` defaults to `SMTP_USER`. The API can start without
+SMTP configured, but sending email requires valid SMTP host and sender settings.
+`TEST_EMAIL` is only used by an optional email-test helper that the server does
+not currently invoke.
 
-## Running the Server
+### Run Locally
 
 Start the application in development mode:
 
@@ -130,7 +211,26 @@ Each worker shares a queue-wide BullMQ limiter, so email delivery is capped at
 five times with exponential backoff. Redis must be available to both the API and
 worker processes.
 
-## Health Check
+## Deployment
+
+This project does not have a public deployment yet. Add the hosted base URL to
+the **Hosted API** line at the top of this README after deployment.
+
+For a production deployment:
+
+1. Provide the environment variables listed in the setup section using the
+   hosting provider's secret/environment-variable settings.
+2. Start the API with `node src/server.js`. The API and Socket.IO share the same
+   HTTP server and port; configure the host to expose its assigned `PORT`.
+3. If bulk email is enabled, run `npm run worker:email` as a separate
+   background worker and configure the API and worker to use the same Redis
+   service and SMTP credentials.
+4. Configure a production MongoDB connection, a strong unique `JWT_SECRET`, and
+   SMTP sender credentials. Do not commit `.env` or production secrets.
+5. After deployment, check `https://<your-backend-host>/health` and replace the
+   placeholder in the Hosted API section with the actual public URL.
+
+### Health Check
 
 The server exposes a basic health endpoint:
 
@@ -296,13 +396,6 @@ cannot be saved as a message.
 - Passwords are hashed before storage.
 - Users sign in to receive a JWT token.
 - Protected routes require the JWT token in the `X-Access-Token` header.
-
-## Notes
-
-- Usernames are unique and restricted to letters, numbers, and underscores.
-- Workspaces support admin and member roles.
-- Join codes are used to add members to workspaces.
-- Channels are associated with a specific workspace and managed by authenticated users.
 
 ## Scripts
 
