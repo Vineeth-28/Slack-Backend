@@ -1,5 +1,7 @@
 ﻿# Slack Backend
 
+![Project Status](https://img.shields.io/badge/status-completed-brightgreen)
+
 A REST API and real-time messaging backend for a Slack-inspired collaboration
 platform. Built with Node.js, Express, MongoDB, and Socket.IO, this project
 demonstrates authenticated workspace and channel management, persistent
